@@ -64,20 +64,6 @@ class Level {
     this.status = null;
     this.finishDelay = 1;
   }
-  // get grid(rows, collumn){
-  //   let this.grid = [];
-  //   for (let i = 0; i < rows; i++){
-  //     grid[i] = [];
-  //     for (let j = 0; j < collumn; j++){
-  //       grid[i][j] = 0;
-  //     }
-  //   }
-  // }
-  get actors(){
-    let actors = [];
-    actors.push(this.actor);
-    return actors;
-  }
   get player(){
     this.player = this.actor.find(player => player.type === 'player');
   }
@@ -87,12 +73,6 @@ class Level {
   get width(){
     this.width = this.grid.reduce((m, e) => {return Math.max(e.length)});
   }
-  // get status(){
-  //   this.status = null;
-  // }
-  // get finishDelay(){
-  //   this.finishDelay = 1;
-  // }
   isFinished(){
     return (this.status !== null && this.finishDelay < 0) ? true : false;
   }
@@ -113,11 +93,11 @@ class Level {
 
     for(let i = top; i < bottom; i++){
       for(let j = left; j < right; j++){
-        return this.grid[i][j] !== undefined;
+        if(this.grid[i][j] !== undefined){
+         return this.grid[i][j];
+        }
       }
     }
-    // if(this.grid[top][left] !== undefined && this.grid[top][right] !== undefined) {
-    // }
   }
   removeActor(travelActor){
     let who = this.actor.findIndex(who => who === travelActor);
