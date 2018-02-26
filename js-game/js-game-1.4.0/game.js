@@ -49,7 +49,7 @@ class Actor {
   }
   isIntersect(travelActor){
     if(!(travelActor instanceof Actor) || !travelActor){
-      throw new Error('Error');
+      throw new Error('Объект не пренадлежит типу Actor или не передано аргументов');
     }
       if(travelActor === this){
         return false;
@@ -98,28 +98,30 @@ class Level {
   }
   actorAt(travelActor){
     if(!(travelActor instanceof Actor) || !travelActor){
-      throw new Error('Error');
+      throw new Error('Объект не пренадлежит типу Actor или не определён');
     }
-      if(){
-        return;
-      }
+    return this.actor.find(act => act.isIntersect(travelActor));
   }
   obstacleAt(posVector, sizeVector){
     if(!(posVector instanceof Vector && sizeVector instanceof Vector)) {
-      throw new Error('Можно прибавлять к вектору только вектор типа Vector');
+      throw new Error('Можно использовать только вектор типа Vector');
     }
     let left = posVector.x.toFixed();
     let right = (posVector.x + sizeVector.x).toFixed();
     let top = posVector.y.toFixed();
     let bottom = (posVector.y + sizeVector.y).toFixed();
 
-    if(this.grid[top][left] !== undefined && this.grid[top][right] !== undefined) {
+    for(let i = top; i < bottom; i++){
+      for(let j = left; j < right; j++){
+        return this.grid[i][j] !== undefined;
+      }
     }
+    // if(this.grid[top][left] !== undefined && this.grid[top][right] !== undefined) {
+    // }
   }
   removeActor(travelActor){
-    if(let who = this.actor.findIndex(who => who === travelActor){
-      return  this.actor.splice(who, 1);
-    };
+    let who = this.actor.findIndex(who => who === travelActor);
+    return  this.actor.splice(who, 1);
   }
   noMoreActors(type){
     return this.actor.findIndex(types => types.type === type) ? false : true;
@@ -132,7 +134,7 @@ class Level {
       let coin = this.actor.findIndex(coin => coin.type === 'coin');
       this.actor.splice(coin, 1);
       if(!this.actor.find(coin => coin.type === 'coin')){
-        this.status = won;
+        this.status = 'won';
       }
     }
   }
