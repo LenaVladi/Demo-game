@@ -70,3 +70,79 @@ class Actor {
     }
   }
 }
+
+class Level {
+  constructor(grid = [[undefined, undefined]], actor = [new Actor()]) {
+    this.grid = grid;
+    this.actor = actor;
+    this.status = null;
+    this.finishDelay = 1;
+  }
+  // get grid(rows, collumn){
+  //   let this.grid = [];
+  //   for (let i = 0; i < rows; i++){
+  //     grid[i] = [];
+  //     for (let j = 0; j < collumn; j++){
+  //       grid[i][j] = 0;
+  //     }
+  //   }
+  // }
+  get actors(){
+    let actors = [];
+    actors.push(this.actor);
+    return actors;
+  }
+  get player(){
+    this.player = this.actor.find(player => player.type === 'player');
+  }
+  get height(){
+    this.height = this.grid.length;
+  }
+  get width(){
+    this.width = this.grid.reduce((m, e) => {return Math.max(e.length)});
+  }
+  // get status(){
+  //   this.status = null;
+  // }
+  // get finishDelay(){
+  //   this.finishDelay = 1;
+  // }
+  isFinished(){
+    return (this.status !== null && this.finishDelay < 0) ? true : false;
+  }
+  actorAt(travelActor){
+    try {
+      if(!(travelActor instanceof Actor) || !travelActor){
+        throw 'Error';
+      }
+      if(){
+        return;
+      }
+    } catch(e){
+      alert(e);
+    }
+  }
+  obstacleAt(posVector, sizeVector){
+
+  }
+  removeActor(travelActor){
+    if(let who = this.actor.findIndex(who => who === travelActor){
+      return  this.actor.splice(who, 1);
+    };
+  }
+  noMoreActors(type){
+    return this.actor.findIndex(types => types.type === type) ? false : true;
+  }
+  playerTouched(type, travelActor){
+    if(type === 'lava' || 'fireball'){
+      this.status = 'lost';
+    }
+    if(type === 'coin' && travelActor.type === 'coin'){
+      let coin = this.actor.findIndex(coin => coin.type === 'coin');
+      this.actor.splice(coin, 1);
+      if(!this.actor.find(coin => coin.type === 'coin')){
+        this.status = won;
+      }
+    }
+  }
+}
