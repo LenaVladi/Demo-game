@@ -6,16 +6,12 @@ class Vector {
   }
 
   plus(objVector){
-    try {
-      if(!(objVector instanceof Vector)){
-        throw 'Можно прибавлять к вектору только вектор типа Vector.';
-      }
+    if(!(objVector instanceof Vector)){
+        throw new Error('Можно прибавлять к вектору только вектор типа Vector.');
+    }
       let x = objVector.x + this.x;
       let y = objVector.y + this.y;
       return new Vector(x, y);
-    } catch(e) {
-      alert(e);
-    }
   }
   times(num){
     let x = num * this.x;
@@ -26,16 +22,12 @@ class Vector {
 
 class Actor {
   constructor(pos = new Vector(0, 0), size = new Vector(1, 1), speed = new Vector(0, 0)){
-    try {
-      if(!(pos || size || speed instanceof Vector)){
-        throw 'Можно использовать только вектор типа Vector.';
-      }
+    if(!(pos || size || speed instanceof Vector)){
+      throw new Error('Можно использовать только вектор типа Vector.');
+    }
       this.pos = pos;
       this.size = size;
       this.speed = speed;
-    } catch(e){
-      alert(e);
-    }
   }
   act(){
     return;
@@ -56,18 +48,12 @@ class Actor {
     return 'actor';
   }
   isIntersect(travelActor){
-    try {
-      if(!(travelActor instanceof Actor) || !travelActor){
-        throw 'Error';
-      }
+    if(!(travelActor instanceof Actor) || !travelActor){
+      throw new Error('Error');
+    }
       if(travelActor === this){
         return false;
-      } else
-      return (travelActor.left <= this.right && travelActor.right >= this.left) && (travelActor.top <= this.bottom && travelActor.bottom >= this.top) ? true : false;
-
-    } catch(e) {
-      alert(e);
-    }
+      } else return (travelActor.left <= this.right && travelActor.right >= this.left) && (travelActor.top <= this.bottom && travelActor.bottom >= this.top) ? true : false;
   }
 }
 
@@ -111,19 +97,24 @@ class Level {
     return (this.status !== null && this.finishDelay < 0) ? true : false;
   }
   actorAt(travelActor){
-    try {
-      if(!(travelActor instanceof Actor) || !travelActor){
-        throw 'Error';
-      }
+    if(!(travelActor instanceof Actor) || !travelActor){
+      throw new Error('Error');
+    }
       if(){
         return;
       }
-    } catch(e){
-      alert(e);
-    }
   }
   obstacleAt(posVector, sizeVector){
+    if(!(posVector instanceof Vector && sizeVector instanceof Vector)) {
+      throw new Error('Можно прибавлять к вектору только вектор типа Vector');
+    }
+    let left = posVector.x.toFixed();
+    let right = (posVector.x + sizeVector.x).toFixed();
+    let top = posVector.y.toFixed();
+    let bottom = (posVector.y + sizeVector.y).toFixed();
 
+    if(this.grid[top][left] !== undefined && this.grid[top][right] !== undefined) {
+    }
   }
   removeActor(travelActor){
     if(let who = this.actor.findIndex(who => who === travelActor){
