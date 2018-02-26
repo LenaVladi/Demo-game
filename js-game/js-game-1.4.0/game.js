@@ -64,13 +64,13 @@ class Level {
     this.status = null;
     this.finishDelay = 1;
   }
-  get player(){
+  static player(){
     this.player = this.actor.find(player => player.type === 'player');
   }
-  get height(){
+  static height(){
     this.height = this.grid.length;
   }
-  get width(){
+  static width(){
     this.width = this.grid.reduce((m, e) => {return Math.max(e.length)});
   }
   isFinished(){
@@ -86,10 +86,10 @@ class Level {
     if(!(posVector instanceof Vector && sizeVector instanceof Vector)) {
       throw new Error('Можно использовать только вектор типа Vector');
     }
-    let left = posVector.x.toFixed();
-    let right = (posVector.x + sizeVector.x).toFixed();
-    let top = posVector.y.toFixed();
-    let bottom = (posVector.y + sizeVector.y).toFixed();
+    let left = Math.floor(posVector.x);
+    let right = Math.ceil(posVector.x + sizeVector.x);
+    let top =  Math.floor(posVector.y);
+    let bottom = Math.ceil(posVector.y + sizeVector.y);
 
     for(let i = top; i < bottom; i++){
       for(let j = left; j < right; j++){
