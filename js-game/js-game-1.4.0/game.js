@@ -57,13 +57,13 @@ class Actor {
   }
   isIntersect(travelActor){
     try {
-      if(travelActor !instanceof Actor || !travelActor){
+      if(!(travelActor instanceof Actor) || !travelActor){
         throw 'Error';
       }
       if(travelActor === this){
         return false;
       } else
-      return (travelActor.left < this.right && travelActor.right > this.left) && (travelActor.top > this.bottom && travelActor.bottom < this.top) ? true : false;
+      return (travelActor.left <= this.right && travelActor.right >= this.left) && (travelActor.top <= this.bottom && travelActor.bottom >= this.top) ? true : false;
 
     } catch(e) {
       alert(e);
