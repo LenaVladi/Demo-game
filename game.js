@@ -122,6 +122,11 @@ class Level {
         }
       }
     }
+
+    if(left < 0) return 'wall';
+    if(right > this.width) return 'wall';
+    if(top > this.height) return 'wall';
+    if(bottom < 0) return 'lava';
   }
   removeActor(travelActor){
     let who = this.actor.findIndex(who => who === travelActor);
