@@ -104,7 +104,7 @@ class Level {
     }
     if(this.actor === undefined) return undefined;
     if(this.actor.length = 1) return undefined;
-    return this.actor.filter(act => act.isIntersect(travelActor)) || undefined;
+    return this.actor.find(act => act.isIntersect(travelActor));
   }
   obstacleAt(posVector, sizeVector){
     if(!(posVector instanceof Vector && sizeVector instanceof Vector)) {
@@ -146,12 +146,13 @@ class Level {
 
 class LevelParser {
   constructor(obj) {
-    this.obj = obj;
+    this.obj = obj || undefined;
     this.key = Object.keys(obj);
   }
 
   actorFromSymbol(n) {
-    n = typeof n === 'string' ? n : '';
+    if(!this.obj) return undefined;
+    n = typeof n === 'string' ? n : undefined;
     let name = this.key.find(name => name === n);
     return this.obj[name] ? this.obj[name] : undefined;
   }
