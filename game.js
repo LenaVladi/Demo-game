@@ -22,12 +22,19 @@ class Vector {
 
 class Actor {
   constructor(pos = new Vector(0, 0), size = new Vector(1, 1), speed = new Vector(0, 0)){
-    if(!(pos || size || speed instanceof Vector)){
+    if(!(pos instanceof Vector) || !(size instanceof Vector) || !(speed instanceof Vector)){
       throw new Error('Можно использовать только вектор типа Vector.');
     }
       this.pos = pos;
       this.size = size;
       this.speed = speed;
+      //this.type = 'actor'
+      Object.defineProperty(this, 'type', {
+      value: 'actor',
+      writable: false,
+      configurable: false
+    });
+
   }
   act(){
     return;
@@ -44,34 +51,45 @@ class Actor {
   get bottom(){
     return this.pos.y + this.size.y;
     }
-  type(){
-    return 'actor';
-  }
+
   isIntersect(travelActor){
     if(!(travelActor instanceof Actor) || !travelActor){
       throw new Error('Объект не пренадлежит типу Actor или не передано аргументов');
     }
       if(travelActor === this){
         return false;
-      } else return (travelActor.left <= this.right && travelActor.right >= this.left) && (travelActor.top <= this.bottom && travelActor.bottom >= this.top) ? true : false;
+      } else if (travelActor.left === this.right || travelActor.right === this.left) {
+        return false;
+      } else if(travelActor.top === this.bottom || travelActor.bottom === this.top) {
+        return false;
+      } else return (travelActor.left <= this.right && travelActor.right >= this.left) || (travelActor.top >= this.bottom && travelActor.bottom <= this.top) ? true : false;
   }
 }
 
 class Level {
-  constructor(grid = [[undefined, undefined]], actor = [new Actor()]) {
+  constructor(grid = [], actor) {
     this.grid = grid;
     this.actor = actor;
     this.status = null;
     this.finishDelay = 1;
-  }
+    this.height = this.grid.length;
+   }
   get player(){
     this.player = this.actor.find(player => player.type === 'player');
   }
-  get height(){
-    this.height = this.grid.length;
-  }
   get width(){
-    this.width = this.grid.reduce((m, e) => {return Math.max(e.length)});
+    let max;
+    if(this.grid.length === 0) {
+      max = 0;
+    } else {
+      max = this.grid[0].length;
+      for(let w in this.grid){
+        if(w.length > max){
+          max = w.length;
+        }
+      }
+    }
+    return max;
   }
   isFinished(){
     return (this.status !== null && this.finishDelay < 0) ? true : false;
@@ -80,7 +98,9 @@ class Level {
     if(!(travelActor instanceof Actor) || !travelActor){
       throw new Error('Объект не пренадлежит типу Actor или не определён');
     }
-    return this.actor.find(act => act.isIntersect(travelActor));
+    if(this.actor === undefined) return undefined;
+    if(this.actor.length = 1) return undefined;
+    return this.actor.filter(act => act.isIntersect(travelActor)) || undefined;
   }
   obstacleAt(posVector, sizeVector){
     if(!(posVector instanceof Vector && sizeVector instanceof Vector)) {
@@ -127,18 +147,18 @@ class LevelParser {
   }
 
   actorFromSymbol(n) {
-    n = typeof n === `string` ? n : ``;
+    n = typeof n === 'string' ? n : '';
     let name = this.key.find(name => name === n);
     return this.obj[name] ? this.obj[name] : undefined;
   }
 
   obstacleFromSymbol(n) {
-    n = typeof n === `string` ? n : ``;
+    n = typeof n === 'string' ? n : '';
     switch(n) {
-      case `x` :
-        return `wall`;
-      case `!` :
-        return `lava`;
+      case 'x' :
+        return 'wall';
+      case '!' :
+        return 'lava';
       default : undefined;
     }
   }
@@ -163,4 +183,27 @@ class LevelParser {
   parse(arr) {
     return new Level();
   }
+}
+
+class Fireball extends Actor {
+  constructor(pos = new Vector(), speed = new Vector()) {
+    this.pos = pos;
+    this.speed = speed;
+    this.type = 'fireball';
+    this.size = new Vector(1, 1);
+  }
+
+  getNextPosition(time = 1) {
+    time = typeof time === 'number' ? time : 1;
+    let newX = this.pos.x + (this.speed.x * time);
+    let newY = this.pos.y + (this.speed.y * time);
+    return new Vector(newX, newY);
+  }
+
+  handleObstacle() {
+    this.speed.x = ~this.speed.x + 1;
+    this.speed.y = ~this.speed.y + 1;
+  }
+
+
 }
