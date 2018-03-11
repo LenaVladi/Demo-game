@@ -64,13 +64,13 @@ class Level {
     this.status = null;
     this.finishDelay = 1;
   }
-  static player(){
+  get player(){
     this.player = this.actor.find(player => player.type === 'player');
   }
-  static height(){
+  get height(){
     this.height = this.grid.length;
   }
-  static width(){
+  get width(){
     this.width = this.grid.reduce((m, e) => {return Math.max(e.length)});
   }
   isFinished(){
@@ -104,7 +104,7 @@ class Level {
     return  this.actor.splice(who, 1);
   }
   noMoreActors(type){
-    return this.actor.findIndex(types => types.type === type) ? false : true;
+    return this.actor.findIndex(types => types.type === type) ? true : false;
   }
   playerTouched(type, travelActor){
     if(type === 'lava' || 'fireball'){
@@ -117,5 +117,50 @@ class Level {
         this.status = 'won';
       }
     }
+  }
+}
+
+class LevelParser {
+  constructor(obj) {
+    this.obj = obj;
+    this.key = Object.keys(obj);
+  }
+
+  actorFromSymbol(n) {
+    n = typeof n === `string` ? n : ``;
+    let name = this.key.find(name => name === n);
+    return this.obj[name] ? this.obj[name] : undefined;
+  }
+
+  obstacleFromSymbol(n) {
+    n = typeof n === `string` ? n : ``;
+    switch(n) {
+      case `x` :
+        return `wall`;
+      case `!` :
+        return `lava`;
+      default : undefined;
+    }
+  }
+
+  createGrid(arr) {
+    const line = [];
+    for(let i = 0; i < arr; i++) {
+      let cell = arr[i];
+      const cells = [];
+      for(let n = 0; n < cell.length; n++) {
+        cells.push(this.obstacleFromSymbol(cell[n]));
+      }
+      line.push(cells);
+    }
+    return line;
+  }
+
+  createActors(arr) {
+    return;
+  }
+
+  parse(arr) {
+    return new Level();
   }
 }
