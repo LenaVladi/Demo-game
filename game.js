@@ -91,6 +91,10 @@ class Level {
     }
     return max;
   }
+  get actors() {
+    //this.actor.filter(e => (e instanceof Actor) && (e.prototype.type = 'actor'));
+    this.actor.filter(e => e.type === 'player' || e.type === 'coin' || e.type === 'fireball' || e.type === 'actor');
+  }
   isFinished(){
     return (this.status !== null && this.finishDelay < 0) ? true : false;
   }
