@@ -117,9 +117,8 @@ class Level {
       }
     }
 
-    if(posVector.x < 0) return 'wall';
+    if(left < 0 || top < 0) return 'wall';
     if(right > this.width) return 'wall';
-    if(sizeVector.y === 0) return 'wall';
     if(bottom < 0) return 'lava';
   }
   removeActor(travelActor){
@@ -136,9 +135,9 @@ class Level {
       this.status = 'lost';
     }
     if(type === 'coin' && travelActor.type === 'coin'){
-      let coin = this.actors.findIndex(coin => coin.type === 'coin');
+      let coin = this.actors.findIndex(coin => coin.pos.x === travelActor.pos.x);
       this.actors.splice(coin, 1);
-      if(!this.actors.find(coin => coin.type === 'coin')){
+      if(!(this.actors.find(coin => coin.type === 'coin'))){
         this.status = 'won';
       }
     }
@@ -179,11 +178,24 @@ class LevelParser {
     return line;
   }
 
-  createActors(arr) {
-    return;
+  createActors(plan) {
+    if(plan.length === 0) return [];
+    let posX, posY;
+    const movingObj = [];
+    for(let i = 0; i < plan.length; i++) {
+       posY = i;
+       let str = plan[i];
+       for(let n = 0; n < str.length; n++) {
+         posX = n;
+         let cnstrct = this.obj[str[n]];
+         const essens = cnstrct(posX, posY);
+         movingObj.push(essens);
+       }
+    }
+    return movingObj;
   }
 
-  parse(arr) {
+  parse(plan) {
     return new Level();
   }
 }
@@ -192,8 +204,11 @@ class Fireball extends Actor {
   constructor(pos = new Vector(), speed = new Vector()) {
     this.pos = pos;
     this.speed = speed;
-    this.type = 'fireball';
     this.size = new Vector(1, 1);
+    Object.defineProperty(this, 'type', {
+    value: 'fireball',
+    writable: false,
+  });
   }
 
   getNextPosition(time = 1) {
@@ -208,5 +223,34 @@ class Fireball extends Actor {
     this.speed.y = ~this.speed.y + 1;
   }
 
+  act(time, obj) {
+    // Получить следующую позицию, используя время.
+    // Выяснить, не пересечется ли в следующей позиции объект с каким-либо препятствием. Пересечения с другими движущимися объектами учитывать не нужно.
+    // Если нет, обновить текущую позицию объекта.
+    // Если объект пересекается с препятствием, то необходимо обработать это событие. При этом текущее положение остается прежним.
+  }
 
+}
+
+class HorizontalFireball {
+  constructor(pos = new Vector(1,1)) {
+    this.pos = pos;
+  }
+}
+
+class FireRain {
+  constructor(pos = new Vector(1,1)) {
+    this.pos = pos;
+  }
+}
+
+class Coin extends Actor {
+  constructor(pos = new Vector(0.6, 0.6)) {
+    this.x = pos.x - 0.2;
+    this.y = pos.y - 0.1;
+    this.type = 'coin';
+    this.springSpeed = 8;
+    this.springDist = 0.07;
+    this.spring = Mach.random();
+  }
 }
