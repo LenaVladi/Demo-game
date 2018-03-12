@@ -130,6 +130,7 @@ class Level {
     return this.actors;
   }
   noMoreActors(type){
+    if(!this.actors) return true;
     return this.actors.findIndex(types => types.type === type) ? false : true;
   }
   playerTouched(type, travelActor){
@@ -148,7 +149,7 @@ class Level {
 
 class LevelParser {
   constructor(obj) {
-    this.obj = obj || undefined;
+    this.obj = obj ? obj : undefined;
     this.key = Object.keys(obj);
   }
 
@@ -160,17 +161,21 @@ class LevelParser {
   }
 
   obstacleFromSymbol(n) {
-    n = typeof n === 'string' ? n : '';
-    switch(n) {
-      case 'x' :
-        return 'wall';
-      case '!' :
-        return 'lava';
-      default : undefined;
-    }
+    n = typeof n === 'string' ? n : undefined;
+    if(n === 'x') return 'wall';
+    if(n === '!') return 'lava';
+    else return undefined;
+    // switch(n) {
+    //   case 'x' :
+    //     return 'wall';
+    //   case '!' :
+    //     return 'lava';
+    //   default : undefined;
+    // }
   }
 
   createGrid(arr) {
+    if(arr.length === 0) return [];
     const line = [];
     for(let i = 0; i < arr; i++) {
       let cell = arr[i];
