@@ -113,15 +113,13 @@ class Level {
 
     for(let i = top; i < bottom; i++){
       for(let j = left; j < right; j++){
-        if(this.grid[i][j] !== undefined){
-         return this.grid[i][j];
-        }
+        return this.grid[i][j];
       }
     }
 
-    if(left < 0) return 'wall';
+    if(posVector.x < 0) return 'wall';
     if(right > this.width) return 'wall';
-    if(top > this.height && right > this.height) return 'wall';
+    if(sizeVector.y === 0) return 'wall';
     if(bottom < 0) return 'lava';
   }
   removeActor(travelActor){
@@ -149,35 +147,28 @@ class Level {
 
 class LevelParser {
   constructor(obj) {
-    this.obj = obj ? obj : undefined;
-    this.key = Object.keys(obj);
+    this.obj = obj;
   }
 
   actorFromSymbol(n) {
-    if(!this.obj) return undefined;
-    n = typeof n === 'string' ? n : undefined;
-    let name = this.key.find(name => name === n);
+    if(!n) return undefined;
+    const key = Object.keys(this.obj);
+    //n = typeof n === 'string' ? n : undefined;
+    let name = key.find(name => name === n);
     return this.obj[name] ? this.obj[name] : undefined;
   }
 
   obstacleFromSymbol(n) {
-    n = typeof n === 'string' ? n : undefined;
+    //n = typeof n === 'string' ? n : undefined;
     if(n === 'x') return 'wall';
     if(n === '!') return 'lava';
     else return undefined;
-    // switch(n) {
-    //   case 'x' :
-    //     return 'wall';
-    //   case '!' :
-    //     return 'lava';
-    //   default : undefined;
-    // }
   }
 
   createGrid(arr) {
     if(arr.length === 0) return [];
     const line = [];
-    for(let i = 0; i < arr; i++) {
+    for(let i = 0; i < arr.length; i++) {
       let cell = arr[i];
       const cells = [];
       for(let n = 0; n < cell.length; n++) {
