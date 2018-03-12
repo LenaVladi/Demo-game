@@ -69,13 +69,13 @@ class Actor {
 class Level {
   constructor(grid = [], actor) {
     this.grid = grid;
-    this.actor = actor;
+    this.actors = actor;
     this.status = null;
     this.finishDelay = 1;
     this.height = this.grid.length;
    }
   get player(){
-    this.player = this.actor.find(player => player.type === 'player');
+    this.player = this.actors.find(player => player.type === 'player');
   }
   get width(){
     let max;
@@ -91,10 +91,6 @@ class Level {
     }
     return max;
   }
-  get actors() {
-    //this.actor.filter(e => (e instanceof Actor) && (e.prototype.type = 'actor'));
-    this.actor.filter(e => e.type === 'player' || e.type === 'coin' || e.type === 'fireball' || e.type === 'actor');
-  }
   isFinished(){
     return (this.status !== null && this.finishDelay < 0) ? true : false;
   }
@@ -102,9 +98,9 @@ class Level {
     if(!(travelActor instanceof Actor) || !travelActor){
       throw new Error('Объект не пренадлежит типу Actor или не определён');
     }
-    if(this.actor === undefined) return undefined;
-    if(this.actor.length = 1) return undefined;
-    return this.actor.find(act => act.isIntersect(travelActor));
+    if(this.actors === undefined) return undefined;
+    if(this.actors.length = 1) return undefined;
+    return this.actors.find(act => act.isIntersect(travelActor));
   }
   obstacleAt(posVector, sizeVector){
     if(!(posVector instanceof Vector && sizeVector instanceof Vector)) {
@@ -125,24 +121,25 @@ class Level {
 
     if(left < 0) return 'wall';
     if(right > this.width) return 'wall';
-    if(top > this.height) return 'wall';
+    if(top > this.height && right > this.height) return 'wall';
     if(bottom < 0) return 'lava';
   }
   removeActor(travelActor){
-    let who = this.actor.findIndex(who => who === travelActor);
-    return  this.actor.splice(who, 1);
+    let who = this.actors.findIndex(who => who.pos.x === travelActor.pos.x && who.pos.y === travelActor.pos.y);
+    let deletes = this.actors.splice(who, 1);
+    return this.actors;
   }
   noMoreActors(type){
-    return this.actor.findIndex(types => types.type === type) ? true : false;
+    return this.actors.findIndex(types => types.type === type) ? false : true;
   }
   playerTouched(type, travelActor){
     if(type === 'lava' || 'fireball'){
       this.status = 'lost';
     }
     if(type === 'coin' && travelActor.type === 'coin'){
-      let coin = this.actor.findIndex(coin => coin.type === 'coin');
-      this.actor.splice(coin, 1);
-      if(!this.actor.find(coin => coin.type === 'coin')){
+      let coin = this.actors.findIndex(coin => coin.type === 'coin');
+      this.actors.splice(coin, 1);
+      if(!this.actors.find(coin => coin.type === 'coin')){
         this.status = 'won';
       }
     }
