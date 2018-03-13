@@ -1,19 +1,20 @@
 'use strict';
 class Vector {
-  constructor(x = 0, y = 0){
+  constructor(x = 0, y = 0) {
     this.x = x;
     this.y = y;
   }
 
-  plus(objVector){
-    if(!(objVector instanceof Vector)){
+  plus(objVector) {
+    if(!(objVector instanceof Vector)) {
         throw new Error('Можно прибавлять к вектору только вектор типа Vector.');
     }
       let x = objVector.x + this.x;
       let y = objVector.y + this.y;
       return new Vector(x, y);
   }
-  times(num){
+
+  times(num) {
     let x = num * this.x;
     let y = num * this.y;
     return new Vector(x, y);
@@ -29,24 +30,30 @@ class Actor {
       this.size = size;
       this.speed = speed;
   }
+
   act() {
     return;
   }
+
   get type() {
     return 'actor';
   }
+
   get left() {
     return this.pos.x;
-    }
+  }
+
   get top() {
     return this.pos.y;
-    }
+  }
+
   get right() {
     return this.pos.x + this.size.x;
-      }
+  }
+
   get bottom() {
     return this.pos.y + this.size.y;
-    }
+  }
 
   isIntersect(travelActor) {
     if(!(travelActor instanceof Actor) || !travelActor) {
@@ -69,27 +76,32 @@ class Level {
     this.status = null;
     this.finishDelay = 1;
     this.player = this.actors.find(player => player.type === 'player');
-   }
+  }
+
   get height() {
     return this.grid.length;
   }
+
   get width() {
     if(this.grid.length === 0) return 0;
     let max = this.grid.map(el => { return el.length;});
     return Math.max(...max);
   }
-  isFinished(){
+
+  isFinished() {
     return (this.status !== null && this.finishDelay < 0) ? true : false;
   }
-  actorAt(travelActor){
-    if(!(travelActor instanceof Actor) || !travelActor){
+
+  actorAt(travelActor) {
+    if(!(travelActor instanceof Actor) || !travelActor) {
       throw new Error('Объект не пренадлежит типу Actor или не определён');
     }
     if(this.actors === undefined) return undefined;
     if(this.actors.length = 1) return undefined;
     return this.actors.find(act => act.isIntersect(travelActor));
   }
-  obstacleAt(posVector, sizeVector){
+
+  obstacleAt(posVector, sizeVector) {
     if(!(posVector instanceof Vector && sizeVector instanceof Vector)) {
       throw new Error('Можно использовать только вектор типа Vector');
     }
@@ -98,8 +110,8 @@ class Level {
     let top =  Math.floor(posVector.y);
     let bottom = Math.ceil(posVector.y + sizeVector.y);
 
-    for(let i = top; i < bottom; i++){
-      for(let j = left; j < right; j++){
+    for(let i = top; i < bottom; i++) {
+      for(let j = left; j < right; j++) {
         return this.grid[i][j];
       }
     }
@@ -108,23 +120,26 @@ class Level {
     if(right >= this.width) return 'wall';
     if(bottom <= 0) return 'lava';
   }
-  removeActor(travelActor){
+
+  removeActor(travelActor) {
     let who = this.actors.findIndex(who => who.left === travelActor.left && who.top === travelActor.top);
     let deletes = this.actors.splice(who, 1);
     return this.actors;
   }
-  noMoreActors(type){
+
+  noMoreActors(type) {
     if(this.actors.length === 0) return true;
     return this.actors.find(types => types.type === type) ? false : true;
   }
-  playerTouched(type, travelActor){
-    if(type === 'lava' || 'fireball'){
+
+  playerTouched(type, travelActor) {
+    if(type === 'lava' || 'fireball') {
       this.status = 'lost';
     }
-    if(type === 'coin' && travelActor.type === 'coin'){
+    if(type === 'coin' && travelActor.type === 'coin') {
       let coin = this.actors.findIndex(coin => coin.left === travelActor.left);
       this.actors.splice(coin, 1);
-      if(!(this.actors.find(coin => coin.type === 'coin'))){
+      if(!(this.actors.find(coin => coin.type === 'coin'))) {
         this.status = 'won';
       }
     }
@@ -189,13 +204,14 @@ class LevelParser {
 
 class Fireball extends Actor {
   constructor(pos = new Vector(), speed = new Vector()) {
+    super();
     this.pos = pos;
     this.speed = speed;
     this.size = new Vector(1, 1);
-    Object.defineProperty(this, 'type', {
-    value: 'fireball',
-    writable: false,
-  });
+  }
+
+  get type() {
+    return 'fireball';
   }
 
   getNextPosition(time = 1) {
