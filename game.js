@@ -110,15 +110,18 @@ class Level {
     let top =  Math.floor(posVector.y);
     let bottom = Math.ceil(posVector.y + sizeVector.y);
 
+    if(posVector.x < 0 || posVector.y < 0) return 'wall';
+    if((posVector.x + sizeVector.x) > this.width) return 'wall';
+    if(posVector.y >= this.height) return 'wall';
+    if(posVector.y < 0 && posVector.x < 0) return 'lava';
+
     for(let i = top; i < bottom; i++) {
       for(let j = left; j < right; j++) {
         return this.grid[i][j];
       }
     }
 
-    if(posVector.x <= 0) return 'wall';
-    if(right >= this.width) return 'wall';
-    if(bottom <= 0) return 'lava';
+
   }
 
   removeActor(travelActor) {
@@ -227,10 +230,10 @@ class Fireball extends Actor {
   }
 
   act(time, obj) {
-    // Получить следующую позицию, используя время.
+    let newPos = this.getNextPosition(time);
     // Выяснить, не пересечется ли в следующей позиции объект с каким-либо препятствием. Пересечения с другими движущимися объектами учитывать не нужно.
-    // Если нет, обновить текущую позицию объекта.
-    // Если объект пересекается с препятствием, то необходимо обработать это событие. При этом текущее положение остается прежним.
+    if(newPos.obstacleAt(obj) === undefined) return this.pos = newPos; // Если нет, обновить текущую позицию объекта.
+    else return this.handleObstacle(); // Если объект пересекается с препятствием, то необходимо обработать это событие. При этом текущее положение остается прежним.
   }
 
 }
