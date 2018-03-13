@@ -21,75 +21,62 @@ class Vector {
 }
 
 class Actor {
-  constructor(pos = new Vector(0, 0), size = new Vector(1, 1), speed = new Vector(0, 0)){
-    if(!(pos instanceof Vector) || !(size instanceof Vector) || !(speed instanceof Vector)){
+  constructor(pos = new Vector(0, 0), size = new Vector(1, 1), speed = new Vector(0, 0)) {
+    if(!(pos instanceof Vector) || !(size instanceof Vector) || !(speed instanceof Vector)) {
       throw new Error('Можно использовать только вектор типа Vector.');
     }
       this.pos = pos;
       this.size = size;
       this.speed = speed;
-      //this.type = 'actor'
-      Object.defineProperty(this, 'type', {
-      value: 'actor',
-      writable: false,
-      configurable: false
-    });
-
   }
-  act(){
+  act() {
     return;
   }
-  get left(){
+  get type() {
+    return 'actor';
+  }
+  get left() {
     return this.pos.x;
     }
-  get top(){
+  get top() {
     return this.pos.y;
     }
-  get right(){
+  get right() {
     return this.pos.x + this.size.x;
       }
-  get bottom(){
+  get bottom() {
     return this.pos.y + this.size.y;
     }
 
-  isIntersect(travelActor){
-    if(!(travelActor instanceof Actor) || !travelActor){
+  isIntersect(travelActor) {
+    if(!(travelActor instanceof Actor) || !travelActor) {
       throw new Error('Объект не пренадлежит типу Actor или не передано аргументов');
     }
-      if(travelActor === this){
+      if(travelActor === this) {
         return false;
       } else if (travelActor.left === this.right || travelActor.right === this.left) {
         return false;
       } else if(travelActor.top === this.bottom || travelActor.bottom === this.top) {
         return false;
-      } else return (travelActor.left <= this.right && travelActor.right >= this.left) || (travelActor.top >= this.bottom && travelActor.bottom <= this.top) ? true : false;
+      } else return (travelActor.left >= this.right && travelActor.right <= this.left) || (travelActor.top <= this.bottom && travelActor.bottom >= this.top) ? true : false;
   }
 }
 
 class Level {
-  constructor(grid = [], actor) {
+  constructor(grid = [], actors = []) {
     this.grid = grid;
-    this.actors = actor;
+    this.actors = actors;
     this.status = null;
     this.finishDelay = 1;
-    this.height = this.grid.length;
-   }
-  get player(){
     this.player = this.actors.find(player => player.type === 'player');
+   }
+  get height() {
+    return this.grid.length;
   }
-  get width(){
-    let max;
-    if(this.grid.length === 0) {
-      max = 0;
-    } else {
-      max = this.grid[0].length;
-      for(let w in this.grid){
-        if(w.length > max){
-          max = w.length;
-        }
-      }
-    }
-    return max;
+  get width() {
+    if(this.grid.length === 0) return 0;
+    let max = this.grid.map(el => { return el.length;});
+    return Math.max(...max);
   }
   isFinished(){
     return (this.status !== null && this.finishDelay < 0) ? true : false;
@@ -117,25 +104,25 @@ class Level {
       }
     }
 
-    if(left < 0 || top < 0) return 'wall';
-    if(right > this.width) return 'wall';
-    if(bottom < 0) return 'lava';
+    if(posVector.x <= 0) return 'wall';
+    if(right >= this.width) return 'wall';
+    if(bottom <= 0) return 'lava';
   }
   removeActor(travelActor){
-    let who = this.actors.findIndex(who => who.pos.x === travelActor.pos.x && who.pos.y === travelActor.pos.y);
+    let who = this.actors.findIndex(who => who.left === travelActor.left && who.top === travelActor.top);
     let deletes = this.actors.splice(who, 1);
     return this.actors;
   }
   noMoreActors(type){
-    if(!this.actors) return true;
-    return this.actors.findIndex(types => types.type === type) ? false : true;
+    if(this.actors.length === 0) return true;
+    return this.actors.find(types => types.type === type) ? false : true;
   }
   playerTouched(type, travelActor){
     if(type === 'lava' || 'fireball'){
       this.status = 'lost';
     }
     if(type === 'coin' && travelActor.type === 'coin'){
-      let coin = this.actors.findIndex(coin => coin.pos.x === travelActor.pos.x);
+      let coin = this.actors.findIndex(coin => coin.left === travelActor.left);
       this.actors.splice(coin, 1);
       if(!(this.actors.find(coin => coin.type === 'coin'))){
         this.status = 'won';
