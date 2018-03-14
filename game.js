@@ -96,8 +96,6 @@ class Level {
     if(!(travelActor instanceof Actor) || !travelActor) {
       throw new Error('Объект не пренадлежит типу Actor или не определён');
     }
-    if(this.actors === undefined) return undefined;
-    if(this.actors.length = 1) return undefined;
     return this.actors.find(act => act.isIntersect(travelActor));
   }
 
@@ -110,10 +108,9 @@ class Level {
     let top =  Math.floor(posVector.y);
     let bottom = Math.ceil(posVector.y + sizeVector.y);
 
-    if(posVector.x < 0 || posVector.y < 0) return 'wall';
-    if((posVector.x + sizeVector.x) > this.width) return 'wall';
-    if(posVector.y >= this.height) return 'wall';
-    if(posVector.y < 0 && posVector.x < 0) return 'lava';
+    if(left < 0 || top < 0) return 'wall';
+    if(right > this.width) return 'wall';
+    if(bottom > this.height) return 'lava';
 
     for(let i = top; i < bottom; i++) {
       for(let j = left; j < right; j++) {
@@ -225,8 +222,8 @@ class Fireball extends Actor {
   }
 
   handleObstacle() {
-    this.speed.x = ~this.speed.x + 1;
-    this.speed.y = ~this.speed.y + 1;
+    this.speed.x = -this.speed.x;
+    this.speed.y = -this.speed.y;
   }
 
   act(time, obj) {
