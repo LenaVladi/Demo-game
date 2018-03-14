@@ -181,17 +181,20 @@ class LevelParser {
   }
 
   createActors(plan) {
-    if(plan.length === 0) return [];
+    if(!plan) return [];
     let posX, posY;
     const movingObj = [];
     for(let i = 0; i < plan.length; i++) {
        posY = i;
        let str = plan[i];
        for(let n = 0; n < str.length; n++) {
+         if(!str[n]) return [];
          posX = n;
          let cnstrct = this.obj[str[n]];
-         const essens = cnstrct(posX, posY);
-         movingObj.push(essens);
+         if(this.obj[str[n]] instanceof Actor) {
+           const essens = new cnstrct(posX, posY);
+           movingObj.push(essens);
+         }
        }
     }
     return movingObj;
@@ -222,28 +225,41 @@ class Fireball extends Actor {
   }
 
   handleObstacle() {
-    this.speed.x = -this.speed.x;
-    this.speed.y = -this.speed.y;
+    this.speed.x = -1 * this.speed.x;
+    this.speed.y = -1 * this.speed.y;
   }
 
   act(time, obj) {
     let newPos = this.getNextPosition(time);
     // Выяснить, не пересечется ли в следующей позиции объект с каким-либо препятствием. Пересечения с другими движущимися объектами учитывать не нужно.
-    if(newPos.obstacleAt(obj) === undefined) return this.pos = newPos; // Если нет, обновить текущую позицию объекта.
-    else return this.handleObstacle(); // Если объект пересекается с препятствием, то необходимо обработать это событие. При этом текущее положение остается прежним.
+    let test = newPos.obstacleAt(obj);
+    if(test === 'wall' || test === 'lava') return  this.handleObstacle(); // Если нет, обновить текущую позицию объекта.
+    return this.pos = newPos;// Если объект пересекается с препятствием, то необходимо обработать это событие. При этом текущее положение остается прежним.
   }
 
 }
 
-class HorizontalFireball {
-  constructor(pos = new Vector(1,1)) {
+class HorizontalFireball extends Fireball {
+  constructor(pos = new Vector(1, 1)) {
+    super();
     this.pos = pos;
+    this.speed = new Vector(2, 0);
   }
 }
 
-class FireRain {
+class VerticalFireball extends Fireball {
   constructor(pos = new Vector(1,1)) {
+    super();
     this.pos = pos;
+    this.speed = new Vector(0, 2);
+  }
+}
+
+class FireRain extends Fireball {
+  constructor(pos = new Vector(1, 1)) {
+    super();
+    this.pos = pos;
+    this.speed = new Vector(0, 3);
   }
 }
 
