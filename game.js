@@ -286,10 +286,12 @@ class Coin extends Actor {
   }
 
   getNextPosition(time = 1) {
-
+    this.updateSpring(time);
+    let newY = this.pos.y + this.getSpringVector().y;
+    return new Vector(this.pos.x, newY);
   }
 
   act(time) {
-
+    this.pos = this.getNextPosition(time);
   }
 }
