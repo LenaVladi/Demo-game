@@ -295,3 +295,16 @@ class Coin extends Actor {
     this.pos = this.getNextPosition(time);
   }
 }
+
+class Player extends Actor {
+  constructor(pos = new Vector()) {
+    super();
+    this.pos = new Vector(pos.x + 0, pos.y + (-0.5));
+    this.size = new Vector(0.8, 1.5);
+    this.speed = new Vector(0, 0);
+  }
+
+  get type() {
+    return 'player';
+  }
+}
