@@ -182,26 +182,50 @@ class LevelParser {
 
   createActors(plan) {
     if(!plan) return [];
+    if(!this.obj) return [];
+
+    // return plan.map((el, indY) => {
+    //     el.split('').forEach((symb, indX) => {
+    //       if(newMovingObj && typeof newMovingObj === 'function' && this.obj[symb] instanceof Actor) {
+    //         new newMovingObj(new Vector(indX, indY));
+    //       }
+    //     });
+    //   });
+
+    //   const movingsObj = [];
+    //   plan.forEach((el, indY) => {
+    //     el.split('').forEach((symb, indX) => {
+    //       let newMovingObj = this.actorFromSymbol(symb)
+    //       if(newMovingObj && typeof newMovingObj === 'function' && this.obj[symb] instanceof Actor) {
+    //         movingsObj.push(new newMovingObj(new Vector(indX, indY)));
+    //       }
+    //     })
+    //   });
+    //   return movingsObj;
+    // }
+
     let posX, posY;
     const movingObj = [];
     for(let i = 0; i < plan.length; i++) {
        posY = i;
        let str = plan[i];
        for(let n = 0; n < str.length; n++) {
-         if(!str[n]) return [];
-         posX = n;
-         let cnstrct = this.obj[str[n]];
-         if(this.obj[str[n]] instanceof Actor) {
-           const essens = new cnstrct(posX, posY);
-           movingObj.push(essens);
-         }
-       }
+         let newMovingObj = this.actorFromSymbol(str[n])
+           if(newMovingObj && typeof newMovingObj === 'function' && this.obj[str[n]] instanceof Actor) {
+             posX = n;
+             const essens = new cnstrct(new Vector(posX, posY));
+             movingObj.push(essens);
+           }
+        }
+
     }
     return movingObj;
   }
 
   parse(plan) {
-    return new Level();
+    const grid = this.createGrid(plan);
+    const actors = this.createActors(plan);
+    return new Level(grid, actors);
   }
 }
 
@@ -308,3 +332,43 @@ class Player extends Actor {
     return 'player';
   }
 }
+
+
+// start game
+
+const schemas = [
+  [
+    '         ',
+    '         ',
+    '    =    ',
+    '       o ',
+    '     !xxx',
+    ' @       ',
+    'xxx!     ',
+    '         '
+  ],
+  [
+    '      v  ',
+    '    v    ',
+    '  v      ',
+    '        o',
+    '        x',
+    '@   x    ',
+    'x        ',
+    '         '
+  ]
+];
+const actorDict = {
+  '@': Player,
+  '=': HorizontalFireball,
+  'v': FireRain,
+  'o': Coin
+}
+const parser = new LevelParser(actorDict);
+const level = parser.parse(schema);
+DOMDisplay(document.body, level);
+runLevel(level, DOMDisplay)
+ .then(status => console.log(`Игрок ${status}`));
+
+// runGame(schemas, parser, DOMDisplay)
+//   .then(() => console.log('Вы выиграли приз!'));
