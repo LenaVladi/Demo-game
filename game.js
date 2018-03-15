@@ -242,7 +242,6 @@ class Fireball extends Actor {
   }
 
   getNextPosition(time = 1) {
-    time = typeof time === 'number' ? time : 1;
     let newX = this.pos.x + (this.speed.x * time);
     let newY = this.pos.y + (this.speed.y * time);
     return new Vector(newX, newY);
@@ -256,10 +255,9 @@ class Fireball extends Actor {
   act(time, obj) {
     let newPos = this.getNextPosition(time);
     // Выяснить, не пересечется ли в следующей позиции объект с каким-либо препятствием. Пересечения с другими движущимися объектами учитывать не нужно.
-    let test = newPos.obstacleAt(obj);
-    if(test === 'wall' || test === 'lava') return  this.handleObstacle(); // Если нет, обновить текущую позицию объекта.
-    return this.pos = newPos;// Если объект пересекается с препятствием, то необходимо обработать это событие. При этом текущее положение остается прежним.
-  }
+    let test = obj.obstacleAt(newPos, this.size);
+    if(test === 'wall' || test === 'lava') return this.handleObstacle();
+    return this.pos = newPos;
 
 }
 
@@ -274,6 +272,7 @@ class HorizontalFireball extends Fireball {
 class VerticalFireball extends Fireball {
   constructor(pos = new Vector(1,1)) {
     super();
+    this.startPos = pos;
     this.pos = pos;
     this.speed = new Vector(0, 2);
   }
@@ -283,7 +282,12 @@ class FireRain extends Fireball {
   constructor(pos = new Vector(1, 1)) {
     super();
     this.pos = pos;
+    this.startPos = new Vector(this.pos.x, this.pos.y);
     this.speed = new Vector(0, 3);
+  }
+
+  handleObstacle() {
+    this.pos = this.startPos;
   }
 }
 
@@ -292,6 +296,7 @@ class Coin extends Actor {
     super();
     this.size = new Vector(0.6, 0.6);
     this.pos = new Vector(pos.x + 0.2, pos.y + 0.1);
+    this.startPos = new Vector(this.pos.x, this.pos.y);
     this.springSpeed = 8;
     this.springDist = 0.07;
     this.spring = Math.random() * (Math.PI * 2 * this.size.x);
@@ -311,8 +316,8 @@ class Coin extends Actor {
 
   getNextPosition(time = 1) {
     this.updateSpring(time);
-    let newY = this.pos.y + this.getSpringVector().y;
-    return new Vector(this.pos.x, newY);
+    let newY = this.startPos.y + this.getSpringVector().y;
+    return new Vector(this.startPos.x, newY);
   }
 
   act(time) {
@@ -365,10 +370,10 @@ const actorDict = {
   'o': Coin
 }
 const parser = new LevelParser(actorDict);
-const level = parser.parse(schema);
-DOMDisplay(document.body, level);
+const level = parser.parse(schemas);
+new DOMDisplay(document.body, level);
 runLevel(level, DOMDisplay)
  .then(status => console.log(`Игрок ${status}`));
 
-// runGame(schemas, parser, DOMDisplay)
-//   .then(() => console.log('Вы выиграли приз!'));
+runGame(schemas, parser, DOMDisplay)
+  .then(() => console.log('Вы выиграли приз!'));
