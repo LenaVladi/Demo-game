@@ -153,10 +153,7 @@ class LevelParser {
 
   actorFromSymbol(n) {
     if(!n) return undefined;
-    const key = Object.keys(this.obj);
-    //n = typeof n === 'string' ? n : undefined;
-    let name = key.find(name => name === n);
-    return this.obj[name] ? this.obj[name] : undefined;
+    return this.obj[n] ? this.obj[n] : undefined;
   }
 
   obstacleFromSymbol(n) {
@@ -184,42 +181,24 @@ class LevelParser {
     if(!plan) return [];
     if(!this.obj) return [];
 
-    // return plan.map((el, indY) => {
-    //     el.split('').forEach((symb, indX) => {
-    //       if(newMovingObj && typeof newMovingObj === 'function' && this.obj[symb] instanceof Actor) {
-    //         new newMovingObj(new Vector(indX, indY));
-    //       }
-    //     });
-    //   });
-
-    //   const movingsObj = [];
-    //   plan.forEach((el, indY) => {
-    //     el.split('').forEach((symb, indX) => {
-    //       let newMovingObj = this.actorFromSymbol(symb)
-    //       if(newMovingObj && typeof newMovingObj === 'function' && this.obj[symb] instanceof Actor) {
-    //         movingsObj.push(new newMovingObj(new Vector(indX, indY)));
-    //       }
-    //     })
-    //   });
-    //   return movingsObj;
-    // }
-
-    let posX, posY;
-    const movingObj = [];
+    let posX, posY, countMouvingObj = 0;
+    const movingsObj = [];
     for(let i = 0; i < plan.length; i++) {
        posY = i;
        let str = plan[i];
        for(let n = 0; n < str.length; n++) {
-         let newMovingObj = this.actorFromSymbol(str[n])
-           if(newMovingObj && typeof newMovingObj === 'function' && this.obj[str[n]] instanceof Actor) {
-             posX = n;
-             const essens = new cnstrct(new Vector(posX, posY));
-             movingObj.push(essens);
+         posX = n;
+         let testClass = this.actorFromSymbol(str[n])
+         if(typeof testClass === 'function') {
+           let newMovingObj = new testClass(new Vector(posX, posY));
+           if(newMovingObj instanceof Actor) {
+             movingsObj.push(newMovingObj);
            }
-        }
-
+           countMouvingObj++;
+         }
+       }
     }
-    return movingObj;
+    return movingsObj;
   }
 
   parse(plan) {
@@ -242,6 +221,7 @@ class Fireball extends Actor {
   }
 
   getNextPosition(time = 1) {
+    //time = typeof time === 'number' ? time : 1;
     let newX = this.pos.x + (this.speed.x * time);
     let newY = this.pos.y + (this.speed.y * time);
     return new Vector(newX, newY);
@@ -256,9 +236,9 @@ class Fireball extends Actor {
     let newPos = this.getNextPosition(time);
     // Выяснить, не пересечется ли в следующей позиции объект с каким-либо препятствием. Пересечения с другими движущимися объектами учитывать не нужно.
     let test = obj.obstacleAt(newPos, this.size);
-    if(test === 'wall' || test === 'lava') return this.handleObstacle();
+    if(test === 'wall' || test === 'lava') return  this.handleObstacle();
     return this.pos = newPos;
-
+  }
 }
 
 class HorizontalFireball extends Fireball {
