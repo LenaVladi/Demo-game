@@ -112,9 +112,14 @@ class Level {
     if(right > this.width) return 'wall';
     if(bottom > this.height) return 'lava';
 
+    //return this.grid[top][left];
+
     for(let i = top; i < bottom; i++) {
       for(let j = left; j < right; j++) {
-        return this.grid[i][j];
+        //console.log(this.grid[i][j]);
+        if(this.grid[i][j] !== undefined) {
+          return this.grid[i][j];
+        }
       }
     }
 
@@ -308,7 +313,7 @@ class Coin extends Actor {
 class Player extends Actor {
   constructor(pos = new Vector()) {
     super();
-    this.pos = new Vector(pos.x + 0, pos.y + (-0.5));
+    this.pos = new Vector(pos.x, pos.y + (-0.5));
     this.size = new Vector(0.8, 1.5);
     this.speed = new Vector(0, 0);
   }
@@ -347,13 +352,13 @@ const actorDict = {
   '@': Player,
   '=': HorizontalFireball,
   'v': FireRain,
-  'o': Coin
+  'o': Coin,
+  '|': VerticalFireball,
 }
+
+
 const parser = new LevelParser(actorDict);
 const level = parser.parse(schemas);
-new DOMDisplay(document.body, level);
-runLevel(level, DOMDisplay)
- .then(status => console.log(`Игрок ${status}`));
 
 runGame(schemas, parser, DOMDisplay)
   .then(() => console.log('Вы выиграли приз!'));
