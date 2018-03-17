@@ -9,15 +9,11 @@ class Vector {
     if(!(objVector instanceof Vector)) {
         throw new Error('Можно прибавлять к вектору только вектор типа Vector.');
     }
-      let x = objVector.x + this.x;
-      let y = objVector.y + this.y;
-      return new Vector(x, y);
+      return new Vector(objVector.x + this.x, objVector.y + this.y);
   }
 
   times(num) {
-    let x = num * this.x;
-    let y = num * this.y;
-    return new Vector(x, y);
+    return new Vector(num * this.x, num * this.y);
   }
 }
 
@@ -32,7 +28,7 @@ class Actor {
   }
 
   act() {
-    return;
+
   }
 
   get type() {
@@ -61,11 +57,8 @@ class Actor {
     }
       if(travelActor === this) {
         return false;
-      } else if (travelActor.left === this.right || travelActor.right === this.left) {
-        return false;
-      } else if(travelActor.top === this.bottom || travelActor.bottom === this.top) {
-        return false;
-      } else return (travelActor.left >= this.right && travelActor.right <= this.left) || (travelActor.top <= this.bottom && travelActor.bottom >= this.top) ? true : false;
+      }
+    return (travelActor.left >= this.right || travelActor.right <= this.left || travelActor.top >= this.bottom || travelActor.bottom <= this.top) ? false : true;
   }
 }
 
@@ -96,6 +89,7 @@ class Level {
     if(!(travelActor instanceof Actor) || !travelActor) {
       throw new Error('Объект не пренадлежит типу Actor или не определён');
     }
+    //console.log(this.actors.find(act => act.isIntersect(travelActor)));
     return this.actors.find(act => act.isIntersect(travelActor));
   }
 
@@ -105,24 +99,22 @@ class Level {
     }
     let left = Math.floor(posVector.x);
     let right = Math.ceil(posVector.x + sizeVector.x);
-    let top =  Math.floor(posVector.y);
+    let top =  Math.round(posVector.y);
     let bottom = Math.ceil(posVector.y + sizeVector.y);
 
     if(left < 0 || top < 0) return 'wall';
     if(right > this.width) return 'wall';
-    if(bottom > this.height) return 'lava';
-
-    //return this.grid[top][left];
 
     for(let i = top; i < bottom; i++) {
       for(let j = left; j < right; j++) {
-        //console.log(this.grid[i][j]);
         if(this.grid[i][j] !== undefined) {
+          //console.log(this.grid[i][j])
           return this.grid[i][j];
         }
       }
     }
 
+    if(bottom >= this.height) return 'lava';
 
   }
 
@@ -138,15 +130,21 @@ class Level {
   }
 
   playerTouched(type, travelActor) {
-    if(type === 'lava' || 'fireball') {
+    //console.log(type, travelActor);
+    if(type == 'lava' || type == 'fireball') {
+      //console.log(this.status);
       this.status = 'lost';
     }
     if(type === 'coin' && travelActor.type === 'coin') {
-      let coin = this.actors.findIndex(coin => coin.left === travelActor.left);
-      this.actors.splice(coin, 1);
-      if(!(this.actors.find(coin => coin.type === 'coin'))) {
+      this.removeActor(travelActor);
+      if(this.noMoreActors(travelActor)) {
         this.status = 'won';
       }
+      // let coin = this.actors.findIndex(coin => coin.left === travelActor.left);
+      // this.actors.splice(coin, 1);
+      // if(!(this.actors.find(coin => coin.type === 'coin'))) {
+      //   this.status = 'won';
+      // }
     }
   }
 }
@@ -326,28 +324,6 @@ class Player extends Actor {
 
 // start game
 
-const schemas = [
-  [
-    '         ',
-    '         ',
-    '    =    ',
-    '       o ',
-    '     !xxx',
-    ' @       ',
-    'xxx!     ',
-    '         '
-  ],
-  [
-    '      v  ',
-    '    v    ',
-    '  v      ',
-    '        o',
-    '        x',
-    '@   x    ',
-    'x        ',
-    '         '
-  ]
-];
 const actorDict = {
   '@': Player,
   '=': HorizontalFireball,
@@ -356,9 +332,7 @@ const actorDict = {
   '|': VerticalFireball,
 }
 
-
-const parser = new LevelParser(actorDict);
-const level = parser.parse(schemas);
-
-runGame(schemas, parser, DOMDisplay)
-  .then(() => console.log('Вы выиграли приз!'));
+loadLevels().then(schemas => {
+    const parser = new LevelParser(actorDict);
+    runGame(JSON.parse(schemas), parser, DOMDisplay).then(() => alert('Вы выиграли приз!'));
+  })
