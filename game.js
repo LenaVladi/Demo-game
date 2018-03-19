@@ -89,7 +89,6 @@ class Level {
     if(!(travelActor instanceof Actor) || !travelActor) {
       throw new Error('Объект не пренадлежит типу Actor или не определён');
     }
-    //console.log(this.actors.find(act => act.isIntersect(travelActor)));
     return this.actors.find(act => act.isIntersect(travelActor));
   }
 
@@ -109,7 +108,6 @@ class Level {
     for(let i = top; i < bottom; i++) {
       for(let j = left; j < right; j++) {
         if(this.grid[i][j] !== undefined) {
-          //console.log(this.grid[i][j])
           return this.grid[i][j];
         }
       }
@@ -128,9 +126,7 @@ class Level {
   }
 
   playerTouched(type, travelActor) {
-    //console.log(type, travelActor);
     if(type == 'lava' || type == 'fireball') {
-      //console.log(this.status);
       this.status = 'lost';
     }
     if(type === 'coin' && travelActor.type === 'coin') {
@@ -138,11 +134,6 @@ class Level {
       if(!(this.noMoreActors(travelActor))) {
         this.status = 'won';
       }
-      // let coin = this.actors.findIndex(coin => coin.left === travelActor.left);
-      // this.actors.splice(coin, 1);
-      // if(!(this.actors.find(coin => coin.type === 'coin'))) {
-      //   this.status = 'won';
-      // }
     }
   }
 }
@@ -158,7 +149,6 @@ class LevelParser {
   }
 
   obstacleFromSymbol(n) {
-    //n = typeof n === 'string' ? n : undefined;
     if(n === 'x') return 'wall';
     if(n === '!') return 'lava';
     else return undefined;
@@ -222,7 +212,6 @@ class Fireball extends Actor {
   }
 
   getNextPosition(time = 1) {
-    //time = typeof time === 'number' ? time : 1;
     let newX = this.pos.x + (this.speed.x * time);
     let newY = this.pos.y + (this.speed.y * time);
     return new Vector(newX, newY);
@@ -235,7 +224,6 @@ class Fireball extends Actor {
 
   act(time, obj) {
     let newPos = this.getNextPosition(time);
-    // Выяснить, не пересечется ли в следующей позиции объект с каким-либо препятствием. Пересечения с другими движущимися объектами учитывать не нужно.
     let test = obj.obstacleAt(newPos, this.size);
     if(test === 'wall' || test === 'lava') return  this.handleObstacle();
     return this.pos = newPos;
@@ -318,7 +306,6 @@ class Player extends Actor {
     return 'player';
   }
 }
-
 
 // start game
 
