@@ -104,6 +104,7 @@ class Level {
 
     if(left < 0 || top < 0) return 'wall';
     if(right > this.width) return 'wall';
+    if(bottom > this.height) return 'lava';
 
     for(let i = top; i < bottom; i++) {
       for(let j = left; j < right; j++) {
@@ -113,9 +114,6 @@ class Level {
         }
       }
     }
-
-    if(bottom >= this.height) return 'lava';
-
   }
 
   removeActor(travelActor) {
