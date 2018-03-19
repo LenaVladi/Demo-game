@@ -135,7 +135,7 @@ class Level {
     }
     if(type === 'coin' && travelActor.type === 'coin') {
       this.removeActor(travelActor);
-      if(this.noMoreActors(travelActor)) {
+      if(!(this.noMoreActors(travelActor))) {
         this.status = 'won';
       }
       // let coin = this.actors.findIndex(coin => coin.left === travelActor.left);
