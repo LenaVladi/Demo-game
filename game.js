@@ -131,7 +131,7 @@ class Level {
     }
     if(type === 'coin' && travelActor.type === 'coin') {
       this.removeActor(travelActor);
-      if(!(this.noMoreActors(travelActor))) {
+      if((this.noMoreActors(travelActor))) {
         this.status = 'won';
       }
     }
