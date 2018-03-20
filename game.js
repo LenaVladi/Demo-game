@@ -9,7 +9,7 @@ class Vector {
     if(!(objVector instanceof Vector)) {
         throw new Error('Можно прибавлять к вектору только вектор типа Vector.');
     }
-      return new Vector(objVector.x + this.x, objVector.y + this.y);
+    return new Vector(objVector.x + this.x, objVector.y + this.y);
   }
 
   times(num) {
@@ -156,16 +156,14 @@ class LevelParser {
 
   createGrid(arr) {
     if(arr.length === 0) return [];
-    const line = [];
-    for(let i = 0; i < arr.length; i++) {
-      let cell = arr[i];
-      const cells = [];
-      for(let n = 0; n < cell.length; n++) {
-        cells.push(this.obstacleFromSymbol(cell[n]));
+
+    return arr.map(cell => {
+      let cells = [];
+      for(let sumb of cell.split('')) {
+        cells.push(this.obstacleFromSymbol(sumb));
       }
-      line.push(cells);
-    }
-    return line;
+      return cells;
+    });
   }
 
   createActors(plan) {
@@ -212,14 +210,19 @@ class Fireball extends Actor {
   }
 
   getNextPosition(time = 1) {
-    let newX = this.pos.x + (this.speed.x * time);
-    let newY = this.pos.y + (this.speed.y * time);
-    return new Vector(newX, newY);
+    let speed = this.speed.times(time);
+    let pos = this.pos.plus(speed);
+    return new Vector(pos.x, pos.y);
+    // let newX = this.pos.x + (this.speed.x * time);
+    // let newY = this.pos.y + (this.speed.y * time);
+    //return new Vector(newX, newY);
   }
 
   handleObstacle() {
-    this.speed.x = -1 * this.speed.x;
-    this.speed.y = -1 * this.speed.y;
+    this.speed = this.speed.times(-1);
+    return this.speed;
+    // this.speed.x = -1 * this.speed.x;
+    // this.speed.y = -1 * this.speed.y;
   }
 
   act(time, obj) {
