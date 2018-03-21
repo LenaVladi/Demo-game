@@ -104,9 +104,7 @@ class Level {
 
     for(let i = top; i < bottom; i++) {
       for(let j = left; j < right; j++) {
-        if(this.grid[i][j] !== undefined) {
-          return this.grid[i][j];
-        }
+        return this.grid[i][j];
       }
     }
   }
@@ -119,7 +117,7 @@ class Level {
 
   noMoreActors(type) {
     if(this.actors.length === 0) return true;
-    return this.actors.find(types => types.type === type) ? false : true;
+    return !this.actors.find(types => types.type === type);
   }
 
   playerTouched(type, travelActor) {
@@ -128,7 +126,7 @@ class Level {
     }
     if(type === 'coin' && travelActor.type === 'coin') {
       this.removeActor(travelActor);
-      if((this.noMoreActors(travelActor))) {
+      if(this.noMoreActors(travelActor.type)) {
         this.status = 'won';
       }
     }
@@ -147,7 +145,7 @@ class LevelParser {
 
   obstacleFromSymbol(n) {
     if(n === 'x') return 'wall';
-    if(n === '!') return 'lava';
+    else if(n === '!') return 'lava';
     else return undefined;
   }
 
@@ -207,14 +205,13 @@ class Fireball extends Actor {
 
   handleObstacle() {
     this.speed = this.speed.times(-1);
-    return this.speed;
   }
 
   act(time, obj) {
     let newPos = this.getNextPosition(time);
     let test = obj.obstacleAt(newPos, this.size);
-    if(test === 'wall' || test === 'lava') return  this.handleObstacle();
-    return this.pos = newPos;
+    if(test) this.handleObstacle();
+    else this.pos = newPos;
   }
 }
 
