@@ -7,7 +7,7 @@ class Vector {
 
   plus(objVector) {
     if(!(objVector instanceof Vector)) {
-        throw new Error('Можно прибавлять к вектору только вектор типа Vector.');
+      throw new Error('Можно прибавлять к вектору только вектор типа Vector.');
     }
     return new Vector(objVector.x + this.x, objVector.y + this.y);
   }
@@ -22,9 +22,9 @@ class Actor {
     if(!(pos instanceof Vector) || !(size instanceof Vector) || !(speed instanceof Vector)) {
       throw new Error('Можно использовать только вектор типа Vector.');
     }
-      this.pos = pos;
-      this.size = size;
-      this.speed = speed;
+    this.pos = pos;
+    this.size = size;
+    this.speed = speed;
   }
 
   act() {
@@ -55,9 +55,7 @@ class Actor {
     if(!(travelActor instanceof Actor) || !travelActor) {
       throw new Error('Объект не пренадлежит типу Actor или не передано аргументов');
     }
-      if(travelActor === this) {
-        return false;
-      }
+    if(travelActor === this) return false;
     return (travelActor.left >= this.right || travelActor.right <= this.left || travelActor.top >= this.bottom || travelActor.bottom <= this.top) ? false : true;
   }
 }
@@ -77,8 +75,7 @@ class Level {
 
   get width() {
     if(this.grid.length === 0) return 0;
-    let max = this.grid.map(el => { return el.length;});
-    return Math.max(...max);
+    return Math.max(...this.grid.map(el => {return el.length;}));
   }
 
   isFinished() {
@@ -158,11 +155,9 @@ class LevelParser {
     if(arr.length === 0) return [];
 
     return arr.map(cell => {
-      let cells = [];
-      for(let sumb of cell.split('')) {
-        cells.push(this.obstacleFromSymbol(sumb));
-      }
-      return cells;
+      return cell.split('').map(sumb => {
+        return this.obstacleFromSymbol(sumb);
+      });
     });
   }
 
@@ -170,30 +165,25 @@ class LevelParser {
     if(!plan) return [];
     if(!this.obj) return [];
 
-    let posX, posY, countMouvingObj = 0;
-    const movingsObj = [];
-    for(let i = 0; i < plan.length; i++) {
-       posY = i;
-       let str = plan[i];
-       for(let n = 0; n < str.length; n++) {
-         posX = n;
-         let testClass = this.actorFromSymbol(str[n])
-         if(typeof testClass === 'function') {
-           let newMovingObj = new testClass(new Vector(posX, posY));
-           if(newMovingObj instanceof Actor) {
-             movingsObj.push(newMovingObj);
-           }
-           countMouvingObj++;
-         }
-       }
-    }
-    return movingsObj;
+    const createActors = [];
+
+    plan.forEach((str, indY) => {
+      return str.split('').forEach((sumb, indX) => {
+        let TestClass = this.actorFromSymbol(sumb);
+        if(typeof TestClass === 'function') {
+          let newMovingObj = new TestClass(new Vector(indX, indY));
+          if(newMovingObj instanceof Actor) {
+            createActors.push(newMovingObj);
+          }
+        }
+      });
+    });
+
+    return createActors;
   }
 
   parse(plan) {
-    const grid = this.createGrid(plan);
-    const actors = this.createActors(plan);
-    return new Level(grid, actors);
+    return new Level(this.createGrid(plan), this.createActors(plan));
   }
 }
 
@@ -213,16 +203,11 @@ class Fireball extends Actor {
     let speed = this.speed.times(time);
     let pos = this.pos.plus(speed);
     return new Vector(pos.x, pos.y);
-    // let newX = this.pos.x + (this.speed.x * time);
-    // let newY = this.pos.y + (this.speed.y * time);
-    //return new Vector(newX, newY);
   }
 
   handleObstacle() {
     this.speed = this.speed.times(-1);
     return this.speed;
-    // this.speed.x = -1 * this.speed.x;
-    // this.speed.y = -1 * this.speed.y;
   }
 
   act(time, obj) {
