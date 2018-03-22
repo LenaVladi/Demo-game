@@ -99,7 +99,7 @@ class Level {
     }
     let left = Math.floor(posVector.x);
     let right = Math.ceil(posVector.x + sizeVector.x);
-    let top =  Math.round(posVector.y);
+    let top =  Math.floor(posVector.y);
     let bottom = Math.ceil(posVector.y + sizeVector.y);
 
     if ((left < 0 || top < 0) || (right > this.width)) {
@@ -111,7 +111,9 @@ class Level {
 
     for (let i = top; i < bottom; i++) {
       for (let j = left; j < right; j++) {
-        return this.grid[i][j];
+        if (this.grid[i][j] !== undefined) {
+          return this.grid[i][j];
+        }
       }
     }
   }
