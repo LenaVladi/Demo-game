@@ -55,7 +55,9 @@ class Actor {
     if(!(travelActor instanceof Actor) || !travelActor) {
       throw new Error('Объект не пренадлежит типу Actor или не передано аргументов');
     }
-    if(travelActor === this) return false;
+    if(travelActor === this) {
+      return false;
+    }
     return (travelActor.left >= this.right || travelActor.right <= this.left || travelActor.top >= this.bottom || travelActor.bottom <= this.top) ? false : true;
   }
 }
@@ -74,7 +76,9 @@ class Level {
   }
 
   get width() {
-    if(this.grid.length === 0) return 0;
+    if(this.grid.length === 0) {
+      return 0;
+    }
     return Math.max(...this.grid.map(el => {return el.length;}));
   }
 
@@ -98,9 +102,12 @@ class Level {
     let top =  Math.round(posVector.y);
     let bottom = Math.ceil(posVector.y + sizeVector.y);
 
-    if(left < 0 || top < 0) return 'wall';
-    if(right > this.width) return 'wall';
-    if(bottom > this.height) return 'lava';
+    if((left < 0 || top < 0) || (right > this.width)) {
+      return 'wall';
+    }
+    if(bottom > this.height) {
+      return 'lava';
+    }
 
     for(let i = top; i < bottom; i++) {
       for(let j = left; j < right; j++) {
@@ -116,7 +123,9 @@ class Level {
   }
 
   noMoreActors(type) {
-    if(this.actors.length === 0) return true;
+    if(this.actors.length === 0) {
+      return true;
+    }
     return !this.actors.find(types => types.type === type);
   }
 
@@ -139,19 +148,26 @@ class LevelParser {
   }
 
   actorFromSymbol(n) {
-    if(!n) return undefined;
+    if(!n) {
+      return undefined;
+    }
     return this.obj[n] ? this.obj[n] : undefined;
   }
 
   obstacleFromSymbol(n) {
-    if(n === 'x') return 'wall';
-    else if(n === '!') return 'lava';
-    else return undefined;
+    if(n === 'x') {
+      return 'wall';
+    } else if(n === '!') {
+      return 'lava';
+    } else {
+      return undefined;
+    }
   }
 
   createGrid(arr) {
-    if(arr.length === 0) return [];
-
+    if(arr.length === 0) {
+      return [];
+    }
     return arr.map(cell => {
       return cell.split('').map(sumb => {
         return this.obstacleFromSymbol(sumb);
@@ -160,11 +176,11 @@ class LevelParser {
   }
 
   createActors(plan) {
-    if(!plan) return [];
-    if(!this.obj) return [];
+    if((!plan) || (!this.obj)) {
+      return [];
+    }
 
     const createActors = [];
-
     plan.forEach((str, indY) => {
       return str.split('').forEach((sumb, indX) => {
         let TestClass = this.actorFromSymbol(sumb);
@@ -176,7 +192,6 @@ class LevelParser {
         }
       });
     });
-
     return createActors;
   }
 
@@ -210,8 +225,11 @@ class Fireball extends Actor {
   act(time, obj) {
     let newPos = this.getNextPosition(time);
     let test = obj.obstacleAt(newPos, this.size);
-    if(test) this.handleObstacle();
-    else this.pos = newPos;
+    if(test) {
+      this.handleObstacle();
+    } else {
+      this.pos = newPos;
+    }
   }
 }
 
