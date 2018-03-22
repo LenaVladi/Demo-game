@@ -6,7 +6,7 @@ class Vector {
   }
 
   plus(objVector) {
-    if(!(objVector instanceof Vector)) {
+    if (!(objVector instanceof Vector)) {
       throw new Error('Можно прибавлять к вектору только вектор типа Vector.');
     }
     return new Vector(objVector.x + this.x, objVector.y + this.y);
@@ -52,10 +52,10 @@ class Actor {
   }
 
   isIntersect(travelActor) {
-    if(!(travelActor instanceof Actor) || !travelActor) {
+    if (!(travelActor instanceof Actor) || !travelActor) {
       throw new Error('Объект не пренадлежит типу Actor или не передано аргументов');
     }
-    if(travelActor === this) {
+    if (travelActor === this) {
       return false;
     }
     return (travelActor.left >= this.right || travelActor.right <= this.left || travelActor.top >= this.bottom || travelActor.bottom <= this.top) ? false : true;
@@ -76,7 +76,7 @@ class Level {
   }
 
   get width() {
-    if(this.grid.length === 0) {
+    if (this.grid.length === 0) {
       return 0;
     }
     return Math.max(...this.grid.map(el => {return el.length;}));
@@ -87,14 +87,14 @@ class Level {
   }
 
   actorAt(travelActor) {
-    if(!(travelActor instanceof Actor) || !travelActor) {
+    if (!(travelActor instanceof Actor) || !travelActor) {
       throw new Error('Объект не пренадлежит типу Actor или не определён');
     }
     return this.actors.find(act => act.isIntersect(travelActor));
   }
 
   obstacleAt(posVector, sizeVector) {
-    if(!(posVector instanceof Vector && sizeVector instanceof Vector)) {
+    if (!(posVector instanceof Vector && sizeVector instanceof Vector)) {
       throw new Error('Можно использовать только вектор типа Vector');
     }
     let left = Math.floor(posVector.x);
@@ -102,15 +102,15 @@ class Level {
     let top =  Math.round(posVector.y);
     let bottom = Math.ceil(posVector.y + sizeVector.y);
 
-    if((left < 0 || top < 0) || (right > this.width)) {
+    if ((left < 0 || top < 0) || (right > this.width)) {
       return 'wall';
     }
-    if(bottom > this.height) {
+    if (bottom > this.height) {
       return 'lava';
     }
 
-    for(let i = top; i < bottom; i++) {
-      for(let j = left; j < right; j++) {
+    for (let i = top; i < bottom; i++) {
+      for (let j = left; j < right; j++) {
         return this.grid[i][j];
       }
     }
@@ -123,19 +123,19 @@ class Level {
   }
 
   noMoreActors(type) {
-    if(this.actors.length === 0) {
+    if (this.actors.length === 0) {
       return true;
     }
     return !this.actors.find(types => types.type === type);
   }
 
   playerTouched(type, travelActor) {
-    if(type == 'lava' || type == 'fireball') {
+    if (type == 'lava' || type == 'fireball') {
       this.status = 'lost';
     }
-    if(type === 'coin' && travelActor.type === 'coin') {
+    if (type === 'coin' && travelActor.type === 'coin') {
       this.removeActor(travelActor);
-      if(this.noMoreActors(travelActor.type)) {
+      if (this.noMoreActors(travelActor.type)) {
         this.status = 'won';
       }
     }
@@ -148,14 +148,14 @@ class LevelParser {
   }
 
   actorFromSymbol(n) {
-    if(!n) {
+    if (!n) {
       return undefined;
     }
     return this.obj[n] ? this.obj[n] : undefined;
   }
 
   obstacleFromSymbol(n) {
-    if(n === 'x') {
+    if (n === 'x') {
       return 'wall';
     } else if(n === '!') {
       return 'lava';
@@ -165,7 +165,7 @@ class LevelParser {
   }
 
   createGrid(arr) {
-    if(arr.length === 0) {
+    if (arr.length === 0) {
       return [];
     }
     return arr.map(cell => {
@@ -176,7 +176,7 @@ class LevelParser {
   }
 
   createActors(plan) {
-    if((!plan) || (!this.obj)) {
+    if ((!plan) || (!this.obj)) {
       return [];
     }
 
@@ -184,9 +184,9 @@ class LevelParser {
     plan.forEach((str, indY) => {
       return str.split('').forEach((sumb, indX) => {
         let TestClass = this.actorFromSymbol(sumb);
-        if(typeof TestClass === 'function') {
+        if (typeof TestClass === 'function') {
           let newMovingObj = new TestClass(new Vector(indX, indY));
-          if(newMovingObj instanceof Actor) {
+          if (newMovingObj instanceof Actor) {
             createActors.push(newMovingObj);
           }
         }
@@ -225,7 +225,7 @@ class Fireball extends Actor {
   act(time, obj) {
     let newPos = this.getNextPosition(time);
     let test = obj.obstacleAt(newPos, this.size);
-    if(test) {
+    if (test) {
       this.handleObstacle();
     } else {
       this.pos = newPos;
